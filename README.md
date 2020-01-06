@@ -30,7 +30,7 @@ use quarkblockchain\ERC20;
         }
 
         try{
-            $blocks = rpc("eth_getBlockByNumber",$blockArray);
+            $blocks = $this->rpc("eth_getBlockByNumber",$blockArray);
         }
         catch (\Exception $exception)
         {
@@ -86,7 +86,7 @@ use quarkblockchain\ERC20;
     {
 
         //查询交易是否成功
-        $receipt = rpc("eth_getTransactionReceipt", [[$v['hash']]]);
+        $receipt = $this->rpc("eth_getTransactionReceipt", [[$v['hash']]]);
         if (isset($receipt[0]['result'])) {
             //判断交易是否成功
             if(isset($receipt[0]['result']['root']))
@@ -112,8 +112,8 @@ use quarkblockchain\ERC20;
         $tx->hash = $v['hash'];
         $tx->block_hash = $v['blockHash'];
         $tx->block_number = base_convert($v['blockNumber'], 16, 10);
-        $tx->gas_price = bcdiv(HexDec2($v['gasPrice']), gmp_pow(10, 18), 18);
-        $tx->amount = bcdiv(HexDec2($v['value']), gmp_pow(10, 18), 18);
+        $tx->gas_price = bcdiv($this->HexDec2($v['gasPrice']), gmp_pow(10, 18), 18);
+        $tx->amount = bcdiv($this->HexDec2($v['value']), gmp_pow(10, 18), 18);
         $tx->created_at = $timestamp;
         $tx->tx_status = 1;
 
@@ -135,7 +135,7 @@ use quarkblockchain\ERC20;
             $token_tx = new TransactionInputTransfer($input);
             //判断to是否为cct合约地址，如果是则添加
             if ($v['to'] == "XXXXXXXXXXXXXXX") {
-                $token_tx_amount = bcdiv(HexDec2($token_tx->amount), gmp_pow(10,$decimals), 18);
+                $token_tx_amount = bcdiv($this->HexDec2($token_tx->amount), gmp_pow(10,$decimals), 18);
                 //是通证，保存通证信息
                 $tx->token_tx_amount = $token_tx_amount;
                 $tx->payee = $token_tx->payee;//保存接收地址
@@ -175,7 +175,7 @@ use quarkblockchain\ERC20;
         }
 
         $param = json_encode($param);
-        $data_str = curlPost($param);
+        $data_str = $this->curlPost($param);
         $data = json_decode($data_str,true);
 
         return $data;
